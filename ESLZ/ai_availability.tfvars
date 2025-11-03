@@ -1,38 +1,33 @@
-subscription_id = "00000000-0000-0000-0000-000000000000"
+ai_webtest_alert = {
+  rg_name      = "tfhero-dev-canadacentral-rg"
+  location     = "canadacentral"
+  name_prefix  = "tfhero"
+  env          = "dev"
+  tags = {
+    env        = "dev"
+    created_by = "terraform"
+    chapter    = "v30_ai_aca_availability"
+  }
 
-rg_name   = "monitoring-dev-rg"
-location  = "canadacentral"
-name_prefix = "tfhero"
+  # Reuse existing LAW (do not create)
+  law_rg_name = "tfhero-dev-canadacentral-rg"
+  law_name    = "tfhero-dev-canadacentral-law"
 
-law_rg_name = "logs-dev-rg"
-law_name    = "logs-dev-law"
+  # The URL you want to probe
+  backend_health_url         = "https://your-public-app.example.com/health"
 
-backend_health_url = "https://my-public-app.example.com/health"
+  # Synthetic test
+  web_test_name              = "tfhero-dev-canadacentral-health"
+  web_test_frequency_seconds = 300
+  web_test_geo_locations     = ["us-va-ash-azr", "us-ca-sjc-azr", "emea-gb-db3-azr"]
 
-alert_emails = [
-  "first.last@example.com",
-  "sre@example.com",
-]
+  # Alert recipients + behavior
+  alert_emails                     = ["firstname.lastname@myemail.ca", "br234asdf@icloud.com"]
+  app_name                         = "ResumeAI"
+  alert_severity                   = 0
+  alert_failed_locations_threshold = 2
 
-app_name      = "ResumeAI"
-alert_severity = 0   # Sev0
-
-web_test_frequency_seconds = 300
-web_test_geo_locations = [
-  "us-va-ash-azr",
-  "us-ca-sjc-azr",
-  "emea-gb-db3-azr",
-]
-
-# Fire when >= 2 locations fail in the window
-alert_failed_locations_threshold = 2
-
-# KQL — must be supplied here
-kql_query = 
-
-tags = {
-  env        = "dev"
-  owner      = "platform"
-  created_by = "terraform"
-  chapter    = "v30_ai_aca_availability"
+  # IMPORTANT: leave the literal token $${WEB_TEST_NAME}; the module replaces it.
+  kql_query = <<KQL
+KQL
 }

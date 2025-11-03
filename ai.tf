@@ -6,5 +6,5 @@ resource "azurerm_application_insights" "ai" {
   workspace_id                = data.azurerm_log_analytics_workspace.law.id
   internet_ingestion_enabled  = true
   internet_query_enabled      = true
-  tags                        = var.tags
+  tags                        = local.tags
 }

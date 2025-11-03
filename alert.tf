@@ -1,11 +1,11 @@
-resource "azurerm_monitor_scheduled_query_rules_alert_v2" "ai_availability_failed_locations" {
+resource "azurerm_monitor_scheduled_query_rules_alert_v2" "availability" {
   name                = "${local.base_name}-health-kql-alert"
   display_name        = "FATAL: unable to reach ${var.app_name}"
   resource_group_name = var.rg_name
   location            = var.location
 
   scopes                  = [data.azurerm_log_analytics_workspace.law.id]
-  description             = "Fatal Error: unable to reach ${var.app_name}. KQL-driven availability alert."
+  description             = "Triggers when failed web-test locations >= threshold in the last 5 minutes."
   enabled                 = true
   severity                = var.alert_severity
   evaluation_frequency    = "PT5M"
@@ -13,10 +13,11 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "ai_availability_faile
   auto_mitigation_enabled = false
 
   criteria {
-    query                    = var.kql_query
-    time_aggregation_method  = "Total"
-    operator                 = "GreaterThanOrEqual"
-    threshold                = var.alert_failed_locations_threshold
+    query                   = local.kql_text
+    time_aggregation_method = "Total"
+    metric_measure_column   = "AggregatedValue"
+    operator                = "GreaterThanOrEqual"
+    threshold               = var.alert_failed_locations_threshold
 
     failing_periods {
       number_of_evaluation_periods             = 1
@@ -31,13 +32,12 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "ai_availability_faile
       message     = "Availability failure for ${var.app_name} — ${var.backend_health_url}"
       app_name    = var.app_name
       health_url  = var.backend_health_url
-      environment = local.env
+      environment = var.env
       region      = var.location
     }
   }
 
-  tags = var.tags
+  tags = local.tags
 
-  # Not strictly required, but ensures the web test exists before alert evaluates
   depends_on = [azurerm_application_insights_standard_web_test.health]
 }
