@@ -38,6 +38,12 @@ variable "backend_health_url" {
   description = "Public URL to probe (e.g., https://app/health)."
 }
 
+variable "web_test_name" {
+  type        = string
+  description = "Optional explicit name for the Standard Web Test."
+  default     = null
+}
+
 variable "web_test_frequency_seconds" {
   type        = number
   description = "Standard Web Test frequency in seconds (allowed: 300, 600, 900)."

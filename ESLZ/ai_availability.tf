@@ -52,9 +52,7 @@ module "ai_webtest_alert" {
   kql_query = var.ai_webtest_alert.kql_query
 }
 
-output "web_test_name" {
-  value = module.ai_webtest_alert.web_test_name
-}
+web_test_name = var.ai_webtest_alert.web_test_name
 
 output "action_group_emails" {
   value = module.ai_webtest_alert.action_group_emails

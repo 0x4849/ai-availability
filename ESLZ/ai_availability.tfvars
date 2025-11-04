@@ -18,6 +18,7 @@ ai_webtest_alert = {
 
   # Health URL you want to probe
   backend_health_url         = "https://your-public-app.example.com/health"
+   web_test_name              = "tfhero-dev-canadacentral-health"   # <— added
   web_test_frequency_seconds = 300
   web_test_geo_locations     = [
     "us-va-ash-azr",
