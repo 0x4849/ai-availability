@@ -24,7 +24,7 @@ variable "subscription_id" {
 }
 
 module "ai_webtest_alert" {
-  source = "github.com/0x4849/ai-availability.git?ref=v0.1.0"
+  source = "github.com/0x4849/ai-availability.git?ref=v0.2.0"
 
   # resource placement / naming
   rg_name     = var.ai_webtest_alert.rg_name
