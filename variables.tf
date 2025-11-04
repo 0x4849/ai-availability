@@ -1,21 +1,21 @@
 variable "rg_name" {
   type        = string
-  description = "Resource group where AI, Web Test, Action Group, and Alert will be created."
+  description = "Resource Group where AI/Web Test/AG/Alert will be created."
 }
 
 variable "location" {
   type        = string
-  description = "Azure region for AI/Web Test/Alert (e.g., canadacentral)."
+  description = "Azure region for AI/Web Test/AG/Alert."
 }
 
 variable "name_prefix" {
   type        = string
-  description = "Prefix for resource names (e.g., tfhero)."
+  description = "Base prefix for resource names (e.g., tfhero)."
 }
 
 variable "env" {
   type        = string
-  description = "Logical environment (e.g., dev/test/prod)."
+  description = "Environment string (e.g., dev/test/prod)."
 }
 
 variable "tags" {
@@ -25,59 +25,50 @@ variable "tags" {
 
 variable "law_rg_name" {
   type        = string
-  description = "Resource group name where the existing LAW lives."
+  description = "Resource Group of the existing Log Analytics Workspace."
 }
 
 variable "law_name" {
   type        = string
-  description = "Existing Log Analytics Workspace name."
+  description = "Name of the existing Log Analytics Workspace."
 }
 
 variable "backend_health_url" {
   type        = string
-  description = "Public health URL to probe, e.g., https://app.example.com/health"
-}
-
-variable "alert_emails" {
-  type        = list(string)
-  description = "List of email addresses for the action group notifications."
-}
-
-variable "app_name" {
-  type        = string
-  description = "Friendly application name used in alert text."
-}
-
-variable "alert_severity" {
-  type        = number
-  description = "Azure Monitor alert severity (0=Sev0 .. 4=Sev4)."
+  description = "Public URL to probe (e.g., https://app/health)."
 }
 
 variable "web_test_frequency_seconds" {
   type        = number
-  description = "How often to probe (seconds). Must be 300, 600, or 900."
-  validation {
-    condition     = contains([300, 600, 900], var.web_test_frequency_seconds)
-    error_message = "web_test_frequency_seconds must be 300, 600, or 900."
-  }
+  description = "Standard Web Test frequency in seconds (allowed: 300, 600, 900)."
 }
 
 variable "web_test_geo_locations" {
   type        = list(string)
-  description = "List of public web test location IDs (e.g., us-va-ash-azr, us-ca-sjc-azr, emea-gb-db3-azr)."
+  description = "List of probe location IDs for the Standard Web Test."
+}
+
+variable "alert_emails" {
+  type        = list(string)
+  description = "Email recipients for the Action Group."
+}
+
+variable "app_name" {
+  type        = string
+  description = "Logical app name to show in the alert title/body."
+}
+
+variable "alert_severity" {
+  type        = number
+  description = "Alert severity (0-4)."
 }
 
 variable "alert_failed_locations_threshold" {
   type        = number
-  description = "Trigger alert when failed locations >= this value in the 5-minute window."
-}
-
-variable "web_test_name" {
-  type        = string
-  description = "Synthetic monitor (web test) resource name."
+  description = "Trigger alert when >= this many probe locations fail in the window."
 }
 
 variable "kql_query" {
   type        = string
-  description = "Full KQL with the literal token $${WEB_TEST_NAME}. Must project a numeric column named AggregatedValue."
+  description = "KQL used by the alert; must include $${WEB_TEST_NAME} and produce AggregatedValue, AppName, FailureTimeEST."
 }

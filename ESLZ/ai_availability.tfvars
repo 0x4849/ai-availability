@@ -1,33 +1,42 @@
+subscription_id = "00000000-0000-0000-0000-000000000000"
+
 ai_webtest_alert = {
-  rg_name      = "tfhero-dev-canadacentral-rg"
-  location     = "canadacentral"
-  name_prefix  = "tfhero"
-  env          = "dev"
+  # Where to create AI/WebTest/ActionGroup/Alert
+  rg_name     = "monitoring-dev-rg"
+  location    = "canadacentral"
+  name_prefix = "tfhero"
+  env         = "dev"
   tags = {
     env        = "dev"
     created_by = "terraform"
     chapter    = "v30_ai_aca_availability"
   }
 
-  # Reuse existing LAW (do not create)
-  law_rg_name = "tfhero-dev-canadacentral-rg"
-  law_name    = "tfhero-dev-canadacentral-law"
+  # Existing LAW to query (reference only)
+  law_rg_name = "logs-dev-rg"
+  law_name    = "logs-dev-law"
 
-  # The URL you want to probe
+  # Health URL you want to probe
   backend_health_url         = "https://your-public-app.example.com/health"
-
-  # Synthetic test
-  web_test_name              = "tfhero-dev-canadacentral-health"
   web_test_frequency_seconds = 300
-  web_test_geo_locations     = ["us-va-ash-azr", "us-ca-sjc-azr", "emea-gb-db3-azr"]
+  web_test_geo_locations     = [
+    "us-va-ash-azr",
+    "us-ca-sjc-azr",
+    "emea-gb-db3-azr",
+  ]
 
-  # Alert recipients + behavior
-  alert_emails                     = ["firstname.lastname@myemail.ca", "br234asdf@icloud.com"]
-  app_name                         = "ResumeAI"
-  alert_severity                   = 0
+  # Alert setup
+  alert_emails = [
+    "first.last@example.com",
+    "oncall@example.com",
+  ]
+  app_name       = "ResumeAI"
+  alert_severity = 0
+  # 2 of 3 regions must fail to alert
   alert_failed_locations_threshold = 2
 
-  # IMPORTANT: leave the literal token $${WEB_TEST_NAME}; the module replaces it.
+  # KQL: MUST produce columns AggregatedValue (number), AppName (string), FailureTimeEST (string)
+  # Must include the literal token: $${WEB_TEST_NAME}
   kql_query = <<KQL
 KQL
 }

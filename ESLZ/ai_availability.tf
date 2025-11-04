@@ -9,49 +9,61 @@ terraform {
 
 provider "azurerm" {
   features {}
-  # Optional: subscription_id = var.subscription_id
+  # tfvars set the subid
+  subscription_id = var.subscription_id
 }
 
-# One “settings” object to keep caller clean and match your pattern.
+# Single object to keep caller clean
 variable "ai_webtest_alert" {
-  type    = any
-  default = {}
+  type = any
 }
 
-# (Optional) If you want to force a specific subscription here:
-# variable "subscription_id" { type = string }
-
-# Unpack the object into locals for readability (optional)
-locals {
-  s = var.ai_webtest_alert
+# Explicit subscription id (fed via tfvars)
+variable "subscription_id" {
+  type = string
 }
 
 module "ai_webtest_alert" {
-  # Use a relative path in ADO; use the Git URL if hosting the module in a public repo
-  source = "./modules/ai-webtest-alert"
+  source = "github.com/0x4849/ai-availability.git?ref=v0.1.0"
 
-  rg_name      = local.s.rg_name
-  location     = local.s.location
-  name_prefix  = local.s.name_prefix
-  env          = local.s.env
-  tags         = try(local.s.tags, {})
+  # resource placement / naming
+  rg_name     = var.ai_webtest_alert.rg_name
+  location    = var.ai_webtest_alert.location
+  name_prefix = var.ai_webtest_alert.name_prefix
+  env         = var.ai_webtest_alert.env
+  tags        = var.ai_webtest_alert.tags
 
-  # Existing LAW reference
-  law_rg_name  = local.s.law_rg_name
-  law_name     = local.s.law_name
+  # existing LAW (reference only)
+  law_rg_name = var.ai_webtest_alert.law_rg_name
+  law_name    = var.ai_webtest_alert.law_name
 
-  # Web test inputs
-  backend_health_url               = local.s.backend_health_url
-  web_test_name                    = local.s.web_test_name
-  web_test_frequency_seconds       = local.s.web_test_frequency_seconds
-  web_test_geo_locations           = local.s.web_test_geo_locations
+  # web test
+  backend_health_url         = var.ai_webtest_alert.backend_health_url
+  web_test_frequency_seconds = var.ai_webtest_alert.web_test_frequency_seconds
+  web_test_geo_locations     = var.ai_webtest_alert.web_test_geo_locations
 
-  # Alerting
-  alert_emails                     = local.s.alert_emails
-  app_name                         = local.s.app_name
-  alert_severity                   = local.s.alert_severity
-  alert_failed_locations_threshold = local.s.alert_failed_locations_threshold
+  # alerting
+  alert_emails                     = var.ai_webtest_alert.alert_emails
+  app_name                         = var.ai_webtest_alert.app_name
+  alert_severity                   = var.ai_webtest_alert.alert_severity
+  alert_failed_locations_threshold = var.ai_webtest_alert.alert_failed_locations_threshold
 
   # KQL (must contain the literal token $${WEB_TEST_NAME})
-  kql_query                        = local.s.kql_query
+  kql_query = var.ai_webtest_alert.kql_query
+}
+
+output "web_test_name" {
+  value = module.ai_webtest_alert.web_test_name
+}
+
+output "action_group_emails" {
+  value = module.ai_webtest_alert.action_group_emails
+}
+
+output "kql_alert_name" {
+  value = module.ai_webtest_alert.kql_alert_name
+}
+
+output "app_insights_name" {
+  value = module.ai_webtest_alert.app_insights_name
 }

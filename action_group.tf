@@ -1,8 +1,8 @@
 resource "azurerm_monitor_action_group" "ag" {
-  name                = "${local.base_name}-ag"
+  name                = "${var.name_prefix}-${var.env}-${var.location}-ag"
   resource_group_name = var.rg_name
   short_name          = "alerts"
-  tags                = local.tags
+  tags                = var.tags
 
   dynamic "email_receiver" {
     for_each = toset(var.alert_emails)
